@@ -9,7 +9,6 @@ import requests
 import json
 import pandas as pd
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from  urllib.parse import urlencode, quote_plus
 class get_wencaiData():
     def __init__(self,*args):
@@ -44,10 +43,15 @@ class get_wencaiData():
                         'v': 'Aq93Hb20LzbiUSsKwsGDRdzRRPsi6VAN2nagHasE8S54lEME-ySSTxq14l7vS',
         }
     def get_cookies_v_value(self,url):
-		#获取cookies的v值
-        webdriver.ChromeOptions.binary_location=r'E:\Google\Chrome\Application\chrome.exe'#指定浏览器的绝对路径
-        driveLoc=r'E:\Python\Python36\selenium\webdriver\chrome69-71\chromedriver.exe'#指定webdrive的绝对路径
-        driver=webdriver.Chrome(driveLoc)
+
+        chromeOptions=webdriver.ChromeOptions()
+
+        chromeOptions.add_argument('headless')#关闭UI
+        chromeOptions.add_argument('disable-gpu')#关闭GPU加速
+        webdriver.ChromeOptions.binary_location=r'E:\Google\Chrome\Application\chrome.exe'
+        driveLoc=r'E:\Python\Python36\selenium\webdriver\chrome69-71\chromedriver.exe'
+        driver=webdriver.Chrome(executable_path=driveLoc,
+                                chrome_options=chromeOptions)
         driver.get(url)
         cookieV=driver.get_cookies()
         driver.close()
@@ -99,11 +103,9 @@ class get_wencaiData():
                         total=data['total']
                         return data,total
             except Exception:
-                print('数据获取失败，尝试第{}次'.format(i),response.text,self.token,self.cookies)
-#                 self.cookies['v']='Aq93Hb20LzbiUSsKwGDRdzRRPsi6VAN2nagHasE8S54lEME-ySSTxq14l7vS'
+                print('数据获取失败，尝试第{}次'.format(i))
                 self.cookies['v']=self.get_cookies_v_value(response.url)
                 continue
-                #(KeyError('total'), {'code': 130, 'error': 'token已失效', 'success': False})
   
     def parse_data(self,token,args):
         data,total=self.get_json_data()#获取第一页数据默认
@@ -152,5 +154,3 @@ class get_wencaiData():
         else:
             raise ValueError('无[涨停明细]数据字段')
             return 
-        
-        
