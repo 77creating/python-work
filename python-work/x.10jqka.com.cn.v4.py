@@ -40,7 +40,7 @@ class get_wencaiData():
                             }
 
         self.cookies= {
-                        'v': 'Aq93Hb20LzbiUSsKwsGDRdzRRPsi6VAN2nagHasE8S54lEME-ySSTxq14l7vS',
+                        'v': open('cookie.txt','r').read(),
         }
     def get_cookies_v_value(self,url):
 
@@ -55,7 +55,10 @@ class get_wencaiData():
         driver.get(url)
         cookieV=driver.get_cookies()
         driver.close()
-        return cookieV[2]['value']
+        V=cookieV[2]['value']
+        with open('cookie.txt','w') as f:
+            f.write(V)
+        return V
 
 
     def get_token_value(self,*args):
