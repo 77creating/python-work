@@ -44,16 +44,7 @@ class get_wencaiData():
                         'v': open('cookie.txt','r').read(),
         }
     def get_cookies_v_value(self,url):
-#         phantom_path='E:\Python\Python36\selenium\webdriver\phantomjs\phantomjs.exe'
-#         #使用copy()防止修改原代码定义dict
-#         cap = DesiredCapabilities.PHANTOMJS.copy()
-#         #组建头信息
-#         for key, value in self.headers.items():
-#             # cap['phantomjs.page.customHeaders.{}'.format(key)] = value
-#             cap['phantomjs.page.settings.{}'.format(key)] = value
-        
-#         driver=webdriver.PhantomJS(executable_path=phantom_path,
-#                                   desired_capabilities=cap)
+
         chromeOptions=webdriver.ChromeOptions()
 
         chromeOptions.add_argument('headless')#关闭UI
@@ -88,9 +79,7 @@ class get_wencaiData():
         print('获取token成功:',token)
         return 
     def get_json_data(self,p=None):
-        """
-            params:如果数据只有一页，则走公共参数，否则使用局部参数
-        """
+
         i=0
         while i<=3:
             url='http://x.10jqka.com.cn/stockpick/cache'
@@ -106,7 +95,6 @@ class get_wencaiData():
                                     headers=self.headers, 
                                     params=dataParams if p else self.params, 
                                     cookies=self.cookies)
-#             print(response.url)
             try:
                 data=response.json()
                 
@@ -122,10 +110,8 @@ class get_wencaiData():
                     return data,total
             except Exception:
                 print('数据获取失败，尝试第{}次'.format(i),response.text,self.token,self.cookies)
-#                 self.cookies['v']='Aq93Hb20LzbiUSsKwGDRdzRRPsi6VAN2nagHasE8S54lEME-ySSTxq14l7vS'
                 self.cookies['v']=self.get_cookies_v_value(response.url)
                 continue
-                #(KeyError('total'), {'code': 130, 'error': 'token已失效', 'success': False})
   
     def parse_data(self,token,args):
         data,total=self.get_json_data()#获取第一页数据默认
@@ -156,8 +142,7 @@ class get_wencaiData():
     def get_search_data(self):
         
         try:
-            #读取token由立即获取替换成文件保存的形式
-#             token=self.get_token_value(self.args)
+
             df=self.parse_data(self.token,self.args)
             df['首次涨停时间'],df['最终涨停时间']=pd.to_datetime(df['首次涨停时间'],unit='ms',utc=1).dt.tz_convert('Asia/Shanghai'),\
                                                pd.to_datetime(df['最终涨停时间'],unit='ms',utc=1).dt.tz_convert('Asia/Shanghai')
@@ -165,7 +150,6 @@ class get_wencaiData():
         except:
             return df
     def getListData(self,df,code):
-#         codeCols=['涨停时间','涨停打开时间','持续时间','首次封单量','占实际流通比','占成交量比','最高封单量','占实际流通比','占成交量比']
         if '涨停明细数据' in df.columns:
             dataJson=df[df['_stk-code_']==code]['涨停明细数据'].tolist()
             df=pd.DataFrame(dataJson[0])
