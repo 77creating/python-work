@@ -42,13 +42,16 @@ class get_wencaiData():
                         'v': open('cookie.txt','r').read(),
         }
     def get_cookies_v_value(self,url):
+		"""
+			下载相应的webdrive,设置好浏览器和webdrive路径
+		"""
 
         chromeOptions=webdriver.ChromeOptions()
 
         chromeOptions.add_argument('headless')#关闭UI
         chromeOptions.add_argument('disable-gpu')#关闭GPU加速
-        webdriver.ChromeOptions.binary_location=r'E:\Google\Chrome\Application\chrome.exe'
-        driveLoc=r'E:\Python\Python36\selenium\webdriver\chrome69-71\chromedriver.exe'
+        webdriver.ChromeOptions.binary_location=r'E:\Google\Chrome\Application\chrome.exe'#指定好本地的路径
+        driveLoc=r'E:\Python\Python36\selenium\webdriver\chrome69-71\chromedriver.exe'#指定好本地的路径
         driver=webdriver.Chrome(executable_path=driveLoc,
                                 chrome_options=chromeOptions)
         driver.get(url)
@@ -108,7 +111,7 @@ class get_wencaiData():
         if page==1:return df
         else:
             try:
-                for p in range(2,page):
+                for p in range(2,page+1):
                     data,total=self.get_json_data(p)
                     dfs=pd.DataFrame(data['result'],columns=cols)
                     df=df.append(dfs)
@@ -123,8 +126,6 @@ class get_wencaiData():
     def get_search_data(self):
         
         try:
-            #读取token由立即获取替换成文件保存的形式
-#             token=self.get_token_value(self.args)
             df=self.parse_data(self.token,self.args)
             df['首次涨停时间'],df['最终涨停时间']=pd.to_datetime(df['首次涨停时间'],unit='ms',utc=1).dt.tz_convert('Asia/Shanghai'),\
                                                pd.to_datetime(df['最终涨停时间'],unit='ms',utc=1).dt.tz_convert('Asia/Shanghai')
@@ -132,7 +133,6 @@ class get_wencaiData():
         except:
             return df
     def getListData(self,df,code):
-#         codeCols=['涨停时间','涨停打开时间','持续时间','首次封单量','占实际流通比','占成交量比','最高封单量','占实际流通比','占成交量比']
         if '涨停明细数据' in df.columns:
             dataJson=df[df['_stk-code_']==code]['涨停明细数据'].tolist()
             df=pd.DataFrame(dataJson[0])
@@ -140,7 +140,6 @@ class get_wencaiData():
                                          pd.to_datetime(df['updatedTime'],unit='ms',utc=1).dt.tz_convert('Asia/Shanghai'), \
                                          pd.to_datetime(df['openTime'],unit='ms',utc=1).dt.tz_convert('Asia/Shanghai')  
             df.duration=df.duration/(1000*60)
-#             df.columns=codeCols
             return df
         else:
             raise ValueError('无[涨停明细]数据字段')
